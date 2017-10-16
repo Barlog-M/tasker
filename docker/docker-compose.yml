@@ -1,0 +1,37 @@
+version: '3'
+
+networks:
+  tasker:
+    driver: bridge
+
+volumes:
+  config:
+
+services:
+  tasker-postgres-config:
+    build:
+      context: ./postgres-test-config
+    volumes:
+      - config:/config
+
+  tasker-rabbitmq:
+    image: rabbitmq:management-alpine
+    networks:
+      - tasker
+    ports:
+      - "5672:5672"
+      - "15672:15672"
+    environment:
+      - RABBITMQ_DEFAULT_USER=user
+      - RABBITMQ_DEFAULT_PASS=password
+
+  tasker-postgres:
+    image: postgres:alpine
+    networks:
+      - tasker
+    volumes:
+      - config:/config:ro
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_PASSWORD=password

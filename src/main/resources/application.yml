@@ -1,0 +1,33 @@
+spring:
+  main.banner-mode: "off"
+  application.name: tasker_${random.int[1000,9999]}
+  output.ansi.enabled: always
+
+  rabbitmq:
+    username: user
+    password: password
+    template:
+      mandatory: true
+      retry:
+        enabled: true
+        multiplier: 2
+    listener:
+      simple:
+        retry:
+          enabled: true
+          multiplier: 2
+
+  datasource:
+    url: jdbc:postgresql://localhost:5432/postgres
+    driver-class-name: org.postgresql.Driver
+    username: postgres
+    password: password
+
+  jooq:
+    sql-dialect: POSTGRES_9_5
+
+logging:
+  level:
+    root: WARN
+    tasker: INFO
+    org.springframework: WARN
