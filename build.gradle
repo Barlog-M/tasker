@@ -169,7 +169,7 @@ jooq {
 		}
 	}
 }
-
+cleanGenerateDbJooqSchemaSource.enabled = false
 generateDbJooqSchemaSource.enabled = false
 
 wrapper {
