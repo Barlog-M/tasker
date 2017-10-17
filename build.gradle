@@ -6,7 +6,6 @@ buildscript {
 		postgresqlVer = '42.1.4'
 		flywayVer = '4.2.0'
 
-		dockerComposePluginVer = '0.5.4'
 		jooqPluginVer = '2.0.7'
 		propdepsPluginVer = '0.0.10.RELEASE'
 		versionPluginVer = '0.15.0'
@@ -19,6 +18,7 @@ buildscript {
 		maven { url 'https://plugins.gradle.org/m2/' }
 		maven { url 'http://repo.spring.io/plugins-release' }
 	}
+
 	dependencies {
 		classpath "org.jetbrains.kotlin:kotlin-gradle-plugin:$kotlinVer"
 		classpath "org.springframework.boot:spring-boot-gradle-plugin:$springBootVer"
@@ -28,7 +28,6 @@ buildscript {
 		// gradle dependencyUpdates -Drevision=release
 		classpath "com.github.ben-manes:gradle-versions-plugin:$versionPluginVer"
 		classpath "gradle.plugin.com.palantir.gradle.docker:gradle-docker:$dockerPluginVer"
-		classpath "com.avast.gradle:gradle-docker-compose-plugin:$dockerComposePluginVer"
 	}
 }
 
@@ -43,7 +42,6 @@ apply plugin: 'propdeps'
 apply plugin: 'propdeps-idea'
 apply plugin: 'com.github.ben-manes.versions'
 apply plugin: 'com.palantir.docker'
-apply plugin: 'docker-compose'
 apply plugin: 'org.flywaydb.flyway'
 apply plugin: 'nu.studer.jooq'
 
@@ -116,17 +114,6 @@ jar {
 tasks.withType(Test) {
 	maxParallelForks = Runtime.runtime.availableProcessors()
 }
-
-// https://github.com/avast/docker-compose-gradle-plugin
-// gradle composeUp
-// gradle composeDown
-dockerCompose {
-	useComposeFiles = ["${rootDir}/docker/docker-compose.yml"]
-	waitForTcpPorts = true
-	stopContainers = true
-	removeContainers = true
-}
-dockerCompose.isRequiredBy(test)
 
 // gradle flywayMigrate
 // gradle flywayClean
