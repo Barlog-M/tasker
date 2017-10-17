@@ -1,1 +1,4 @@
+tasks:
+  threads: 2
+
 logging.level.root: DEBUG

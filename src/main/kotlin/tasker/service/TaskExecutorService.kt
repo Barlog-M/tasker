@@ -5,18 +5,27 @@ import mu.KLogging
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
 import tasker.model.Task
+import tasker.settings.TaskExecutorSettings
 import tasker.task.TaskComponent
 import java.util.concurrent.Executors
+import java.util.concurrent.ThreadFactory
+import java.util.concurrent.atomic.AtomicInteger
 
 @Service
 open class TaskExecutorService(
 	private val context: ApplicationContext,
-	private val batchService: BatchService
+	private val batchService: BatchService,
+	private val settings: TaskExecutorSettings
 ) {
 	companion object : KLogging()
 
-	private val executor = Executors.newSingleThreadExecutor {
-		Thread(it, "task-executor")
+	private val executor by lazy {
+		Executors.newFixedThreadPool(settings.threads, object: ThreadFactory {
+			private val threadNumber = AtomicInteger(1)
+
+			override fun newThread(r: Runnable) =
+				Thread(r, "task-executor-${threadNumber.getAndIncrement()}")
+		})
 	}
 
 	open fun execute(task: Task, channel: Channel, tag: Long) {

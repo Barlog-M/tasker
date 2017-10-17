@@ -1,3 +1,6 @@
+tasks:
+  threads: 1
+
 spring:
   main.banner-mode: "off"
   application.name: tasker_${random.int[1000,9999]}

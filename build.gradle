@@ -1,7 +1,7 @@
 buildscript {
 	ext {
 		kotlinVer = '1.1.51'
-		springBootVer = '1.5.7.RELEASE'
+		springBootVer = '1.5.8.RELEASE'
 		kotlinLoggingVer = '1.4.6'
 		postgresqlVer = '42.1.4'
 		flywayVer = '4.2.0'
