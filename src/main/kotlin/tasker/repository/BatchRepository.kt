@@ -42,7 +42,10 @@ open class BatchRepository(
 		.execute()
 
 	open fun decrement(id: String) {
-		val q = sql("UPDATE batch SET remain = remain - 1 WHERE id = ? AND remain > 0", id)
-		context.execute(q)
+		context
+			.update(BATCH)
+			.set(BATCH.REMAIN, BATCH.REMAIN.minus(1))
+			.where(BATCH.ID.eq(id).and(BATCH.REMAIN.gt(0)))
+			.execute()
 	}
 }
