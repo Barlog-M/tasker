@@ -7,6 +7,7 @@ package tasker.model.jooq.tables;
 import java.time.LocalDateTime;
 import java.util.Arrays;
 import java.util.List;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -36,7 +37,7 @@ import tasker.model.jooq.tables.records.BatchRecord;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Batch extends TableImpl<BatchRecord> {
 
-    private static final long serialVersionUID = -977492356;
+    private static final long serialVersionUID = -1864698962;
 
     /**
      * The reference instance of <code>public.batch</code>
@@ -54,7 +55,7 @@ public class Batch extends TableImpl<BatchRecord> {
     /**
      * The column <code>public.batch.id</code>.
      */
-    public final TableField<BatchRecord, String> ID = createField("id", org.jooq.impl.SQLDataType.CLOB.nullable(false), this, "");
+    public final TableField<BatchRecord, UUID> ID = createField("id", org.jooq.impl.SQLDataType.UUID.nullable(false), this, "");
 
     /**
      * The column <code>public.batch.type</code>.

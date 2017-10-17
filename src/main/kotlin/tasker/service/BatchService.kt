@@ -21,8 +21,8 @@ open class BatchService(
 	private val taskQueueName: String = ""
 
 	@Transactional
-	open fun start(batchType: BatchType, tasks: List<(String) -> Task>) {
-		val id = UUID.randomUUID().toString()
+	open fun start(batchType: BatchType, tasks: List<(UUID) -> Task>) {
+		val id = UUID.randomUUID()
 		logger.info { "start batchId: $id tasks: $tasks" }
 
 		batchRepository.insert(
@@ -36,7 +36,7 @@ open class BatchService(
 		}
 	}
 
-	open fun decrement(id: String) {
+	open fun decrement(id: UUID) {
 		logger.info { "decrement for id: $id" }
 		try {
 			batchRepository.decrement(id)
@@ -45,7 +45,7 @@ open class BatchService(
 		}
 	}
 
-	open fun status(id: String) =
+	open fun status(id: UUID) =
 		try {
 			batchRepository.selectBy(id)
 		} catch (e: RuntimeException) {

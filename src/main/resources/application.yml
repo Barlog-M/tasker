@@ -31,4 +31,3 @@ logging:
     root: WARN
     tasker: INFO
     org.springframework: WARN
-    org.jooq: DEBUG

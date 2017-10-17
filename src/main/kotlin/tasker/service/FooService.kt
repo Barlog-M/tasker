@@ -6,6 +6,7 @@ import org.springframework.stereotype.Service
 import tasker.model.Task
 import tasker.model.jooq.enums.BatchType
 import tasker.task.FooTaskComponent
+import java.util.UUID
 import java.util.concurrent.ThreadLocalRandom
 
 @Service
@@ -20,7 +21,7 @@ open class FooService(
 
 		val tasks = IntRange(0, random.nextInt(3, 9))
 			.map {
-				{ batchId: String ->
+				{ batchId: UUID ->
 					Task(
 						batchId = batchId,
 						className = FooTaskComponent::class.qualifiedName!!,

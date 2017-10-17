@@ -6,6 +6,7 @@ package tasker.model.jooq.tables.pojos;
 
 import java.io.Serializable;
 import java.time.LocalDateTime;
+import java.util.UUID;
 
 import javax.annotation.Generated;
 
@@ -25,9 +26,9 @@ import tasker.model.jooq.enums.BatchType;
 @SuppressWarnings({ "all", "unchecked", "rawtypes" })
 public class Batch implements Serializable {
 
-    private static final long serialVersionUID = 1743818934;
+    private static final long serialVersionUID = -278075017;
 
-    private final String        id;
+    private final UUID          id;
     private final BatchType     type;
     private final Integer       remain;
     private final Integer       total;
@@ -44,7 +45,7 @@ public class Batch implements Serializable {
     }
 
     public Batch(
-        String        id,
+        UUID          id,
         BatchType     type,
         Integer       remain,
         Integer       total,
@@ -59,7 +60,7 @@ public class Batch implements Serializable {
         this.modified = modified;
     }
 
-    public String getId() {
+    public UUID getId() {
         return this.id;
     }
 
