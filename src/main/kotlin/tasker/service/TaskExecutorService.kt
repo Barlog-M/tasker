@@ -5,7 +5,7 @@ import mu.KLogging
 import org.springframework.context.ApplicationContext
 import org.springframework.stereotype.Service
 import tasker.model.Task
-import tasker.settings.TaskExecutorSettings
+import tasker.properties.TaskExecutorProperties
 import tasker.task.TaskComponent
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
@@ -15,7 +15,7 @@ import java.util.concurrent.atomic.AtomicInteger
 open class TaskExecutorService(
 	private val context: ApplicationContext,
 	private val batchService: BatchService,
-	private val settings: TaskExecutorSettings
+	private val settings: TaskExecutorProperties
 ) {
 	companion object : KLogging()
 
