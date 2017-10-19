@@ -24,23 +24,12 @@ open class BatchRepository(
 			)
 		}
 
-	open fun insert(id: UUID,
-					type: BatchType,
-					total: Int
-	): Int = context
+	open fun new(id: UUID, type: BatchType, total: Int) = context
 		.insertInto(BATCH)
 		.set(BATCH.ID, id)
 		.set(BATCH.TYPE, type)
 		.set(BATCH.TOTAL, total)
 		.set(BATCH.REMAIN, total)
-		.execute()
-
-	open fun update(id: UUID,
-					remain: Int
-	): Int = context
-		.update(BATCH)
-		.set(BATCH.ID, id)
-		.set(BATCH.REMAIN, remain)
 		.execute()
 
 	open fun decrement(id: UUID) = context

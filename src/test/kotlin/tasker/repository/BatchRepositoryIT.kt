@@ -3,6 +3,7 @@ package tasker.repository
 import org.junit.Test
 
 import org.junit.Assert.assertNotNull
+import org.junit.Assert.assertEquals
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.transaction.annotation.Transactional
 import tasker.BaseIT
@@ -17,20 +18,27 @@ open class BatchRepositoryIT : BaseIT() {
 	@Test
 	open fun selectBy() {
 		val id = UUID.randomUUID()
-		batchRepository.insert(id, BatchType.foo, 1)
+		batchRepository.new(id, BatchType.foo, 1)
 		val batch = batchRepository.selectBy(id)
 		assertNotNull(batch)
 	}
 
 	@Test
-	open fun insert() {
-	}
-
-	@Test
-	open fun update() {
+	open fun new() {
+		val id = UUID.randomUUID()
+		batchRepository.new(id, BatchType.foo, 1)
+		val batch = batchRepository.selectBy(id)
+		assertNotNull(batch)
 	}
 
 	@Test
 	open fun decrement() {
+		val id = UUID.randomUUID()
+		batchRepository.new(id, BatchType.foo, 1)
+		val batch = batchRepository.selectBy(id)
+		assertEquals(1, batch.remain)
+		batchRepository.decrement(id)
+		val batchDecremented = batchRepository.selectBy(id)
+		assertEquals(0, batchDecremented.remain)
 	}
 }

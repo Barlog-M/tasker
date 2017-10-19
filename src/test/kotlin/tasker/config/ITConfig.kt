@@ -1,5 +1,6 @@
 package tasker.config
 
+import org.springframework.amqp.rabbit.test.RabbitListenerTest
 import org.springframework.beans.factory.annotation.Autowired
 import org.springframework.beans.factory.annotation.Value
 import org.springframework.boot.autoconfigure.EnableAutoConfiguration
@@ -28,6 +29,7 @@ import javax.annotation.PostConstruct
 		)
 	)
 )
+@RabbitListenerTest(capture = true)
 open class ITConfig {
 	@Value("\${spring.datasource.username}")
 	private val datasourceUsername = ""
@@ -65,13 +67,13 @@ open class ITConfig {
 
 	@Bean(initMethod = "start", destroyMethod = "stop")
 	open fun rabbitContainer(): KGenericContainer =
-		KGenericContainer("rabbitmq:alpine")
+		KGenericContainer("rabbitmq:management-alpine")
+			.withExposedPorts(5672)
 			.withEnv("RABBITMQ_DEFAULT_USER", rabbitmqUsername)
 			.withEnv("RABBITMQ_DEFAULT_PASS", rabbitmqPassword)
 
 	@PostConstruct
 	open fun init() {
-		println("foo password: $datasourcePassword")
 		EnvironmentTestUtils.addEnvironment(
 			context,
 			"spring.rabbitmq.port=${rabbitContainer.getMappedPort(5672)}",

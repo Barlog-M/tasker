@@ -21,11 +21,13 @@ open class BatchService(
 	private val taskQueueName: String = ""
 
 	@Transactional
-	open fun start(batchType: BatchType, tasks: List<(UUID) -> Task>) {
-		val id = UUID.randomUUID()
-		logger.info { "start batchId: $id tasks: $tasks" }
+	open fun start(batchType: BatchType,
+				   tasks: List<(UUID) -> Task>,
+				   idGenerator: () -> UUID = UUID::randomUUID) {
+		val id = idGenerator()
+		logger.info { "start batch with id: $id and tasks: ${tasks.size}" }
 
-		batchRepository.insert(
+		batchRepository.new(
 			id = id,
 			type = batchType,
 			total = tasks.size
@@ -36,19 +38,7 @@ open class BatchService(
 		}
 	}
 
-	open fun decrement(id: UUID) {
-		logger.info { "decrement for id: $id" }
-		try {
-			batchRepository.decrement(id)
-		} catch (e: RuntimeException) {
-			logger.error { "db decrement error: $e" }
-		}
-	}
+	open fun decrement(id: UUID) = batchRepository.decrement(id)
 
-	open fun status(id: UUID) =
-		try {
-			batchRepository.selectBy(id)
-		} catch (e: RuntimeException) {
-			logger.error { "db decrement error: $e" }
-		}
+	open fun status(id: UUID) = batchRepository.selectBy(id)
 }

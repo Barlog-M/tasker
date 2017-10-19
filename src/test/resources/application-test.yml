@@ -1,4 +1,10 @@
 tasks:
   threads: 2
 
-logging.level.root: DEBUG
+logging:
+  level:
+    root: INFO
+    org.testcontainers: WARN
+    com.github.dockerjava: WARN
+    org.springframework: INFO
+    org.springframework.amqp: TRACE

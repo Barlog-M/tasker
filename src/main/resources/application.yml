@@ -7,8 +7,12 @@ spring:
   output.ansi.enabled: always
 
   rabbitmq:
+    host: localhost
+    dynamic: true
+    port: 5672
     username: user
     password: password
+    virtual-host: /
     template:
       mandatory: true
       retry:
