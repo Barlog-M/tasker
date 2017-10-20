@@ -31,7 +31,7 @@ open class FooService(
 			}
 			.toList()
 
-		logger.info { "Created batch of ${tasks.size} jobs" }
+		logger.info { "created batch of ${tasks.size} tasks" }
 
 		batchService.start(BatchType.foo, tasks)
 	}

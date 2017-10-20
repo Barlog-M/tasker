@@ -37,7 +37,7 @@ open class RabbitMQConfig {
 	@Bean
 	open fun taskQueue(taskDlExchange: Exchange): Queue = QueueBuilder
 		.durable("task.queue")
-		.withArgument("x-message-ttl", TTL)
+		//.withArgument("x-message-ttl", TTL)
 		.withArgument("x-dead-letter-exchange", taskDlExchange.name)
 		.build()
 

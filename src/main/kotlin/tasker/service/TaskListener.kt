@@ -32,9 +32,8 @@ open class TaskListener(
 					  @Header(AmqpHeaders.DELIVERY_TAG) tag: Long,
 					  message: Message,
 					  channel: Channel) {
-		logger.trace { "delivery tag: $tag" }
-		logger.trace { "received message: $message" }
-		logger.debug { "received task: $task" }
+		logger.info { "delivery tag: $tag, received message: $message" }
+		logger.info { "received task: $task" }
 
 		taskExecutorService.execute(task, channel, tag, notificator)
 	}
