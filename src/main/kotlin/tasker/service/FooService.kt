@@ -25,7 +25,7 @@ open class FooService(
 					Task(
 						batchId = batchId,
 						className = FooTaskComponent::class.qualifiedName!!,
-						params = mapOf("a" to random.nextInt(0, 99))
+						params = mapOf("a" to setOf(random.nextInt(0, 99)))
 					)
 				}
 			}

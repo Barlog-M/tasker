@@ -13,6 +13,7 @@ import java.util.Optional
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.atomic.AtomicInteger
+import javax.annotation.PreDestroy
 
 @Service
 open class TaskExecutorService(
@@ -29,6 +30,11 @@ open class TaskExecutorService(
 			override fun newThread(r: Runnable) =
 				Thread(r, "task-executor-${threadNumber.getAndIncrement()}")
 		})
+	}
+
+	@PreDestroy
+	open fun destroy() {
+		executor.shutdown()
 	}
 
 	open fun execute(task: Task,

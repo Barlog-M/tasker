@@ -44,7 +44,7 @@ open class RabbitMQConfig {
 	@Bean
 	open fun taskBinding(taskExchange: Exchange,
 						 taskQueue: Queue): Binding = BindingBuilder
-		.bind(taskQueue).to(taskExchange).with("").noargs()
+		.bind(taskQueue).to(taskExchange).with(taskQueue.name).noargs()
 
 	@Bean
 	open fun taskDlExchange(): Exchange = ExchangeBuilder
