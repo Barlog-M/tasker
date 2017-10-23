@@ -12,6 +12,7 @@ import java.io.IOException
 import java.util.Optional
 import java.util.concurrent.Executors
 import java.util.concurrent.ThreadFactory
+import java.util.concurrent.TimeUnit
 import java.util.concurrent.atomic.AtomicInteger
 import javax.annotation.PreDestroy
 
@@ -35,6 +36,11 @@ open class TaskExecutorService(
 	@PreDestroy
 	open fun destroy() {
 		executor.shutdown()
+		try {
+			executor.awaitTermination(1, TimeUnit.MINUTES)
+		} catch (e: InterruptedException) {
+			throw RuntimeException("task executor pool await termination error", e)
+		}
 	}
 
 	open fun execute(task: Task,
