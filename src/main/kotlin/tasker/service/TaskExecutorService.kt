@@ -37,7 +37,10 @@ open class TaskExecutorService(
 	open fun destroy() {
 		executor.shutdown()
 		try {
-			executor.awaitTermination(1, TimeUnit.MINUTES)
+			val done = executor.awaitTermination(1, TimeUnit.MINUTES)
+			if (!done) {
+				logger.warn { "not all task done during thread pool shutdown" }
+			}
 		} catch (e: InterruptedException) {
 			throw RuntimeException("task executor pool await termination error", e)
 		}
