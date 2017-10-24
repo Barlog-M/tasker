@@ -11,6 +11,7 @@ import tasker.repository.BatchRepository
 import java.util.UUID
 
 @Service
+@Transactional
 open class BatchService(
 	private val batchRepository: BatchRepository,
 	private val rabbitTemplate: RabbitTemplate
@@ -20,7 +21,6 @@ open class BatchService(
 	@Value("#{taskQueue.getName()}")
 	private val taskQueueName: String = ""
 
-	@Transactional
 	open fun start(batchType: BatchType,
 				   tasks: List<(UUID) -> Task>,
 				   idGenerator: () -> UUID = UUID::randomUUID) {
@@ -40,5 +40,6 @@ open class BatchService(
 
 	open fun decrement(id: UUID) = batchRepository.decrement(id)
 
+	@Transactional(readOnly = true)
 	open fun status(id: UUID) = batchRepository.selectBy(id)
 }
