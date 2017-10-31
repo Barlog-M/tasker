@@ -164,8 +164,9 @@ jooq {
 cleanGenerateDbJooqSchemaSource.enabled = false
 generateDbJooqSchemaSource.enabled = false
 
-wrapper {
-	gradleVersion '4.2.1'
+task wrapper(type: Wrapper) {
+	gradleVersion = '4.2.1'
+	distributionType = Wrapper.DistributionType.ALL
 }
 
 bootRepackage.mustRunAfter clean

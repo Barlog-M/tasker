@@ -68,7 +68,7 @@ open class TaskExecutorService(
 			return
 		}
 
-		val beanRaw = try {
+		val bean = try {
 			context.getBean(clazz)
 		} catch (e: RuntimeException) {
 			logger.warn { "Wrong type of task. Not found bean of class: ${task.className}" }
@@ -77,10 +77,8 @@ open class TaskExecutorService(
 			return
 		}
 
-		val bean: TaskComponent = try {
-			beanRaw as TaskComponent
-		} catch (e: RuntimeException) {
-			logger.warn { "task bean type is not TaskComponent" }
+		if (bean !is TaskComponent) {
+			logger.warn { "task bean type is not TaskComponent $task" }
 			positiveFinal(channel, tag)
 			saveState(task)
 			return
