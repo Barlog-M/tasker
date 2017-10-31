@@ -5,12 +5,12 @@ MAINTAINER barlog@tanelorn.li
 ARG JAVA_OPTS
 ARG PORT=8080
 
-ENV JAVA_OPTS ${JAVA_OPTS}
-ENV PORT ${PORT}
-
-COPY tasker.jar /
+ENV JAVA_OPTS $JAVA_OPTS
+ENV PORT $PORT
 
 EXPOSE $PORT
+
+COPY tasker.jar /
 
 CMD java $JAVA_OPTS \
 	-Djava.security.egd=file:/dev/./urandom \
