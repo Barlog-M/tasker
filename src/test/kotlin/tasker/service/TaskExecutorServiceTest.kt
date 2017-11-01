@@ -51,6 +51,8 @@ class TaskExecutorServiceTest {
 	}
 }
 
-class TestTaskComponent : TaskComponent {
-	override fun task(params: Map<String, Any>) {}
+class TestTaskComponent : TaskComponent() {
+	override fun task(params: Map<String, Any>) {
+		super.reset()
+	}
 }
