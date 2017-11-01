@@ -10,9 +10,12 @@ import tasker.properties.TaskExecutorProperties
 import tasker.task.TaskComponent
 import java.io.IOException
 import java.util.Optional
+import java.util.concurrent.ExecutionException
 import java.util.concurrent.Executors
+import java.util.concurrent.Future
 import java.util.concurrent.ThreadFactory
 import java.util.concurrent.TimeUnit
+import java.util.concurrent.TimeoutException
 import java.util.concurrent.atomic.AtomicInteger
 import javax.annotation.PreDestroy
 
@@ -50,7 +53,20 @@ open class TaskExecutorService(
 					 channel: Channel,
 					 tag: Long,
 					 notify: (Batch) -> Unit) {
-		executor.submit({ executeTask(task, channel, tag, notify) })
+		val future: Future<*> = executor.submit({ executeTask(task, channel, tag, notify) })
+
+		try {
+			future.get(properties.timeout, TimeUnit.SECONDS)
+		} catch (e: TimeoutException) {
+			logger.error("task execution failed by timeout: $task", e)
+			negativeFinal(channel, tag)
+		} catch (e: ExecutionException) {
+			logger.error("task execution failed: $task", e)
+			negativeFinal(channel, tag)
+		} catch (e: InterruptedException) {
+			logger.error("task execution interrupted: $task", e)
+			negativeFinal(channel, tag)
+		}
 	}
 
 	private fun executeTask(task: Task,
