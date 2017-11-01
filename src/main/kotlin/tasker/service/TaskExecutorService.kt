@@ -53,9 +53,7 @@ open class TaskExecutorService(
 					 channel: Channel,
 					 tag: Long,
 					 notify: (Batch) -> Unit) {
-		val optionalComponent = getTaskComponent(task, channel, tag, notify)
-		if (!optionalComponent.isPresent) return
-		val component = optionalComponent.get()
+		val component = getTaskComponent(task, channel, tag, notify) ?: return
 
 		val future: Future<*> = executor.submit({
 			executeTask(component, task, channel, tag, notify)
@@ -78,13 +76,13 @@ open class TaskExecutorService(
 	private fun getTaskComponent(task: Task,
 								 channel: Channel,
 								 tag: Long,
-								 notify: (Batch) -> Unit): Optional<TaskComponent> {
+								 notify: (Batch) -> Unit): TaskComponent? {
 		val clazz = try {
 			Class.forName(task.className)
 		} catch (e: ClassNotFoundException) {
 			logger.warn { "Wrong type of task. Not found class: ${task.className}" }
 			positiveFinal(task, channel, tag, notify)
-			return Optional.empty()
+			return null
 		}
 
 		val bean = try {
@@ -92,17 +90,17 @@ open class TaskExecutorService(
 		} catch (e: RuntimeException) {
 			logger.warn { "Wrong type of task. Not found bean of class: ${task.className}" }
 			positiveFinal(task, channel, tag, notify)
-			return Optional.empty()
+			return null
 		}
 
 		if (bean !is TaskComponent) {
 			logger.warn { "task bean type is not TaskComponent $task" }
 			positiveFinal(task, channel, tag, notify)
-			return Optional.empty()
+			return null
 		}
 
 		logger.info { "bean: $bean" }
-		return Optional.of(bean)
+		return bean
 	}
 
 	private fun executeTask(component: TaskComponent,
