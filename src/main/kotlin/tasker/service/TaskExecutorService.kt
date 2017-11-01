@@ -53,88 +53,105 @@ open class TaskExecutorService(
 					 channel: Channel,
 					 tag: Long,
 					 notify: (Batch) -> Unit) {
-		val future: Future<*> = executor.submit({ executeTask(task, channel, tag, notify) })
+		val optionalComponent = getTaskComponent(task, channel, tag, notify)
+		if (!optionalComponent.isPresent) return
+		val component = optionalComponent.get()
+
+		val future: Future<*> = executor.submit({
+			executeTask(component, task, channel, tag, notify)
+		})
 
 		try {
 			future.get(properties.timeout, TimeUnit.SECONDS)
 		} catch (e: TimeoutException) {
 			logger.error("task execution failed by timeout: $task", e)
-			negativeFinal(channel, tag)
+			negativeFinal(component, channel, tag)
 		} catch (e: ExecutionException) {
 			logger.error("task execution failed: $task", e)
-			negativeFinal(channel, tag)
+			negativeFinal(component, channel, tag)
 		} catch (e: InterruptedException) {
 			logger.error("task execution interrupted: $task", e)
-			negativeFinal(channel, tag)
+			negativeFinal(component, channel, tag)
 		}
 	}
 
-	private fun executeTask(task: Task,
-							channel: Channel,
-							tag: Long,
-							notify: (Batch) -> Unit) {
-		logger.info { "begin execute task $task" }
-
+	private fun getTaskComponent(task: Task,
+								 channel: Channel,
+								 tag: Long,
+								 notify: (Batch) -> Unit): Optional<TaskComponent> {
 		val clazz = try {
 			Class.forName(task.className)
 		} catch (e: ClassNotFoundException) {
 			logger.warn { "Wrong type of task. Not found class: ${task.className}" }
-			positiveFinal(channel, tag)
-			saveState(task)
-			return
+			positiveFinal(task, channel, tag, notify)
+			return Optional.empty()
 		}
 
 		val bean = try {
 			context.getBean(clazz)
 		} catch (e: RuntimeException) {
 			logger.warn { "Wrong type of task. Not found bean of class: ${task.className}" }
-			positiveFinal(channel, tag)
-			saveState(task)
-			return
+			positiveFinal(task, channel, tag, notify)
+			return Optional.empty()
 		}
 
 		if (bean !is TaskComponent) {
 			logger.warn { "task bean type is not TaskComponent $task" }
-			positiveFinal(channel, tag)
-			saveState(task)
-			return
+			positiveFinal(task, channel, tag, notify)
+			return Optional.empty()
 		}
 
-		logger.debug { "bean: $bean" }
-
-		try {
-			bean.task(task.params)
-		} catch (e: RuntimeException) {
-			logger.error { "task execute error: ${e.message} $task" }
-			negativeFinal(channel, tag)
-			return
-		}
-
-		positiveFinal(channel, tag)
-		val batchOptional = saveState(task)
-
-		try {
-			if (batchOptional.isPresent) {
-				notify(batchOptional.get())
-			}
-		} catch (e: RuntimeException) {
-			logger.error("error on call saveState lambda for task: $task", e)
-		}
+		logger.info { "bean: $bean" }
+		return Optional.of(bean)
 	}
 
-	private fun negativeFinal(channel: Channel, tag: Long) {
+	private fun executeTask(component: TaskComponent,
+							task: Task,
+							channel: Channel,
+							tag: Long,
+							notify: (Batch) -> Unit) {
+		logger.info { "begin execute task $task" }
+
+		try {
+			component.task(task.params)
+		} catch (e: RuntimeException) {
+			logger.error { "task execute error: ${e.message} $task" }
+			negativeFinal(component, channel, tag)
+			return
+		}
+
+		if (!component.isCancelled()) positiveFinal(task, channel, tag, notify)
+	}
+
+	private fun negativeFinal(component: TaskComponent,
+							  channel: Channel,
+							  tag: Long) {
+		logger.info { "tag: $tag" }
 		try {
 			channel.basicNack(tag, false, true)
+			component.cancel()
 		} catch (e: IOException) {
 			logger.error("error basic negative ack with tag $tag and channel: $channel", e)
 		}
 	}
 
-	private fun positiveFinal(channel: Channel, tag: Long) {
+	private fun positiveFinal(task: Task,
+							  channel: Channel,
+							  tag: Long,
+							  notify: (Batch) -> Unit) {
+		logger.info { "tag: $tag" }
 		try {
 			channel.basicAck(tag, false)
+
+			val batchOptional = saveState(task)
+
+			if (batchOptional.isPresent) {
+				notify(batchOptional.get())
+			}
 		} catch (e: IOException) {
 			logger.error("error basic ack with tag $tag and channel: $channel", e)
+		} catch (e: RuntimeException) {
+			logger.error("error on call saveState lambda for task: $task", e)
 		}
 	}
 
