@@ -118,7 +118,11 @@ open class TaskExecutorService(
 			return
 		}
 
-		if (!component.isCancelled()) positiveFinal(task, channel, tag, notify)
+		if (component.isCancelled()) {
+			negativeFinal(component, channel, tag)
+		} else {
+			positiveFinal(task, channel, tag, notify)
+		}
 	}
 
 	private fun negativeFinal(component: TaskComponent,
@@ -126,7 +130,9 @@ open class TaskExecutorService(
 							  tag: Long) {
 		logger.info { "tag: $tag" }
 		try {
-			channel.basicNack(tag, false, true)
+			if (channel.isOpen) {
+				channel.basicNack(tag, false, true)
+			}
 			component.cancel()
 		} catch (e: IOException) {
 			logger.error("error basic negative ack with tag $tag and channel: $channel", e)
@@ -139,7 +145,9 @@ open class TaskExecutorService(
 							  notify: (Batch) -> Unit) {
 		logger.info { "tag: $tag" }
 		try {
-			channel.basicAck(tag, false)
+			if (channel.isOpen) {
+				channel.basicAck(tag, false)
+			}
 
 			val batchOptional = saveState(task)
 
