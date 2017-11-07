@@ -1,6 +1,9 @@
 tasks:
   threads: 2
 
+spring:
+  output.ansi.enabled: always
+
 logging:
   level:
     root: INFO
