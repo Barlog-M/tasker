@@ -8,5 +8,7 @@ import org.springframework.stereotype.Component
 open class TaskExecutorProperties {
 	open var threads = 1
 	/** seconds */
-	open var timeout = 5L
+	open var timeout = 10L
+	open var priority = Thread.NORM_PRIORITY - 2
+	open var sleep = 300L
 }

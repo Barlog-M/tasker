@@ -32,7 +32,9 @@ open class TaskExecutorService(
 			private val threadNumber = AtomicInteger(1)
 
 			override fun newThread(r: Runnable) =
-				Thread(r, "task-executor-${threadNumber.getAndIncrement()}")
+				Thread(r, "task-executor-${threadNumber.getAndIncrement()}").apply {
+					priority = properties.priority
+				}
 		})
 	}
 
@@ -131,6 +133,7 @@ open class TaskExecutorService(
 		logger.info { "tag: $tag" }
 		try {
 			if (channel.isOpen) {
+				reduceCpuUsage()
 				channel.basicNack(tag, false, true)
 			}
 			component.cancel()
@@ -146,6 +149,7 @@ open class TaskExecutorService(
 		logger.info { "tag: $tag" }
 		try {
 			if (channel.isOpen) {
+				reduceCpuUsage()
 				channel.basicAck(tag, false)
 			}
 
@@ -169,4 +173,10 @@ open class TaskExecutorService(
 			logger.error("error saveState final task: $task", e)
 			Optional.empty()
 		}
+
+	private fun reduceCpuUsage() = try {
+		Thread.sleep(properties.sleep)
+	} catch (e: InterruptedException) {
+		Thread.currentThread().interrupt()
+	}
 }
