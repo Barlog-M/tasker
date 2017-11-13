@@ -20,6 +20,7 @@ import org.springframework.boot.autoconfigure.amqp.SimpleRabbitListenerContainer
 import org.springframework.retry.backoff.ExponentialBackOffPolicy
 import org.springframework.retry.support.RetryTemplate
 import org.springframework.util.backoff.ExponentialBackOff
+import tasker.properties.TaskExecutorProperties
 
 @Configuration
 open class RabbitMQConfig {
@@ -86,13 +87,15 @@ open class RabbitMQConfig {
 	open fun rabbitListenerContainerFactoryWithManualAck(
 		configurer: SimpleRabbitListenerContainerFactoryConfigurer,
 		connectionFactory: ConnectionFactory,
-		customConsumerTagStrategy: CustomConsumerTagStrategy
+		customConsumerTagStrategy: CustomConsumerTagStrategy,
+		taskExecutorProperties: TaskExecutorProperties
 	) = rabbitListenerFactory(
 		configurer,
 		connectionFactory,
 		customConsumerTagStrategy
 	).apply {
 		setAcknowledgeMode(AcknowledgeMode.MANUAL)
+		setConcurrentConsumers(taskExecutorProperties.threads)
 	}
 
 	private fun rabbitListenerFactory(

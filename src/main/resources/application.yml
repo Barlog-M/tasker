@@ -1,10 +1,10 @@
 tasks:
-  threads: 1
+  threads: 2
 
 spring:
   main.banner-mode: "off"
   application.name: tasker_${random.int[1000,9999]}
-  output.ansi.enabled: detect
+  output.ansi.enabled: always
 
   rabbitmq:
     host: localhost
